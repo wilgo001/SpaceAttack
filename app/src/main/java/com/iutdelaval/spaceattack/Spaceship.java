@@ -5,31 +5,41 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class Spaceship implements SensorEventListener {
 
-    private ImageButton image;
+    private ImageView image;
     private Context context;
     private float xPos;
     private float yPos;
-    public SensorManager sensorManager;
-    public Sensor accelerometre;
+    private Sensor accelerometre;
     private ConstraintLayout layout;
-    public float maxWidth;
-    public float maxHeight;
+    private float maxHeight;
+    private float maxWidth;
 
-    public Spaceship(ImageButton image, Context context, float maxHeight, float maxWidth) {
-        this.image = image;
+    public Spaceship(Context context, float maxHeight, float maxWidth, ConstraintLayout fenetre) {
+        this.layout = fenetre;
         this.context = context;
-        this.maxHeight = maxHeight;
         this.maxWidth = maxWidth;
-        xPos = 100;
-        yPos = 500;
-        changePosition();
-        sensorManager = (SensorManager) this.context.getSystemService(this.context.SENSOR_SERVICE);
+        this.maxHeight = maxHeight;
+
+        // création de l'imageView du spaceship
+        this.image = new ImageView(context);
+        this.image.setBackgroundResource(R.drawable.spaceship);
+        this.image.setLayoutParams(new ViewGroup.LayoutParams(128, 128));
+
+        //ajout de l'imageView au layout
+        this.layout.addView(image);
+        xPos = maxWidth/2;
+        yPos = maxHeight/2;
+        this.image.setX(xPos);
+        this.image.setX(yPos);
+        SensorManager sensorManager = (SensorManager) this.context.getSystemService(this.context.SENSOR_SERVICE);
         accelerometre = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometre, SensorManager.SENSOR_DELAY_FASTEST);
     }
@@ -38,14 +48,14 @@ public class Spaceship implements SensorEventListener {
      *
      */
     private void changePosition() {
-        boolean inWindow = (xPos <= maxHeight-image.getHeight()-200);
-        inWindow = inWindow && (xPos >= 0);
-        inWindow = inWindow &&(yPos <= maxWidth-image.getWidth()-200);
-        inWindow = inWindow && (yPos >= 0);
-        if(inWindow) {
+        boolean inWindowX = (xPos <= maxWidth -image.getWidth());
+        inWindowX = inWindowX && (xPos >= 0);
+        boolean inWindowY = (yPos <= maxHeight -image.getHeight());
+        inWindowY = inWindowY && (yPos >= 0);
+        if(inWindowX)
             image.setX(xPos);
+        if(inWindowY)
             image.setY(yPos);
-        }
         xPos=image.getX();
         yPos=image.getY();
     }
@@ -64,5 +74,9 @@ public class Spaceship implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
 
+    }
+
+    public void destroy() {
+        image = null;
     }
 }

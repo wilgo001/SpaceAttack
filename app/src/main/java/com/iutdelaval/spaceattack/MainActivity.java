@@ -5,12 +5,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Constraints;
 
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageButton spaceshipImage;
     private Spaceship spaceship;
     private ConstraintLayout fenetre;
     public float maxWidth;
@@ -21,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fenetre =(ConstraintLayout) findViewById(R.id.fenetre);
-        spaceshipImage = (ImageButton) findViewById(R.id.Spaceship);
     }
 
     @Override
@@ -29,7 +29,12 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         maxHeight = fenetre.getHeight();
         maxWidth = fenetre.getWidth();
-        spaceship = new Spaceship(spaceshipImage, this, maxHeight, maxWidth);
+        spaceship = new Spaceship(this, maxHeight, maxWidth, fenetre);
 
+    }
+
+    protected void onPause() {
+        super.onPause();
+        spaceship.destroy();
     }
 }
