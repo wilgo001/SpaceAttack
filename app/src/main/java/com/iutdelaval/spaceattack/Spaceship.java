@@ -5,11 +5,19 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.iutdelaval.spaceattack.ennemis.Ennemi;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Spaceship implements SensorEventListener {
 
@@ -21,6 +29,7 @@ public class Spaceship implements SensorEventListener {
     private ConstraintLayout layout;
     private float maxHeight;
     private float maxWidth;
+    public List<Ennemi> ennemis = new ArrayList<>();
 
     public Spaceship(Context context, float maxHeight, float maxWidth, ConstraintLayout fenetre) {
         this.layout = fenetre;
@@ -33,15 +42,21 @@ public class Spaceship implements SensorEventListener {
         this.image.setBackgroundResource(R.drawable.spaceship);
         this.image.setLayoutParams(new ViewGroup.LayoutParams(128, 128));
 
-        //ajout de l'imageView au layout
-        this.layout.addView(image);
         xPos = maxWidth/2;
         yPos = maxHeight/2;
+
+        //ajout de l'imageView au layout
+        this.layout.addView(image);
+
         this.image.setX(xPos);
-        this.image.setX(yPos);
+        this.image.setY(yPos);
+        Log.d("debug", this.image.getX()+"/"+this.image.getY());
+
         SensorManager sensorManager = (SensorManager) this.context.getSystemService(this.context.SENSOR_SERVICE);
         accelerometre = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometre, SensorManager.SENSOR_DELAY_FASTEST);
+
+        createEnnemis();
     }
     /*
      *changePosition : changer les coordonnees X et Y du vaisseau
@@ -50,7 +65,7 @@ public class Spaceship implements SensorEventListener {
     private void changePosition() {
         boolean inWindowX = (xPos <= maxWidth -image.getWidth());
         inWindowX = inWindowX && (xPos >= 0);
-        boolean inWindowY = (yPos <= maxHeight -image.getHeight());
+        boolean inWindowY = (yPos <= maxHeight -image.getHeight()-100);
         inWindowY = inWindowY && (yPos >= 0);
         if(inWindowX)
             image.setX(xPos);
@@ -77,6 +92,28 @@ public class Spaceship implements SensorEventListener {
     }
 
     public void destroy() {
+
         image = null;
+    }
+
+
+    private void createEnnemis() {
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                Log.println(Log.INFO, "debug", "nouvelle vague d'ennemi");
+                float xPos = 0;
+                float yPos = -50;
+                for (int i = 0; i < 5; i++) {
+                    Log.println(Log.INFO, "debug", "nouvel ennemi");
+                    ennemis.add(new Ennemi(context, xPos, yPos, layout));
+                    Log.println(Log.INFO, "debug", "nouvel ennemi crée");
+                    xPos += maxWidth/5;
+                }
+            }
+        };
+        timer.schedule(task, 2000);
     }
 }

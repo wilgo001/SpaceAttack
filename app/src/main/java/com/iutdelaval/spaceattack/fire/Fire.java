@@ -1,4 +1,4 @@
-package fire;
+package com.iutdelaval.spaceattack.fire;
 
 import android.content.Context;
 import android.widget.ImageView;
