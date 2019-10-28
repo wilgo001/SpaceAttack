@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -27,11 +28,13 @@ public class Spaceship implements SensorEventListener {
     private float yPos;
     private Sensor accelerometre;
     private ConstraintLayout layout;
+    private RelativeLayout relativeLayout;
     private float maxHeight;
     private float maxWidth;
     public List<Ennemi> ennemis = new ArrayList<>();
 
-    public Spaceship(Context context, float maxHeight, float maxWidth, ConstraintLayout fenetre) {
+    public Spaceship(Context context, float maxHeight, float maxWidth, ConstraintLayout fenetre, RelativeLayout relativeLayout) {
+        this.relativeLayout = relativeLayout;
         this.layout = fenetre;
         this.context = context;
         this.maxWidth = maxWidth;
@@ -108,7 +111,7 @@ public class Spaceship implements SensorEventListener {
                 float yPos = -50;
                 for (int i = 0; i < 5; i++) {
                     Log.println(Log.INFO, "debug", "nouvel ennemi");
-                    ennemis.add(new Ennemi(context, xPos, yPos, layout));
+                    ennemis.add(new Ennemi(context, xPos, yPos, relativeLayout));
                     Log.println(Log.INFO, "debug", "nouvel ennemi crée");
                     xPos += maxWidth/5;
                 }

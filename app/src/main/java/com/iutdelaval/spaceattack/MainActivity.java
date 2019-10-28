@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Spaceship spaceship;
     private ConstraintLayout fenetre;
+    private RelativeLayout relativeLayout;
     public float maxWidth;
     public float maxHeight;
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fenetre =(ConstraintLayout) findViewById(R.id.fenetre);
+        relativeLayout = (RelativeLayout) findViewById(R.id.layout);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         maxWidth = metrics.widthPixels;
         maxHeight = metrics.heightPixels;
         Log.println(Log.INFO, "debug", maxHeight+"/"+maxWidth);
-        spaceship = new Spaceship(this, maxHeight, maxWidth, fenetre);
+        spaceship = new Spaceship(this, maxHeight, maxWidth, fenetre, relativeLayout);
     }
 
     protected void onStop() {

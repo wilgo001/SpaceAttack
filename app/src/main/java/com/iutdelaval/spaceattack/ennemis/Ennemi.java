@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -19,11 +20,11 @@ public class Ennemi {
     private Context context;
     private final float xPos;
     private float yPos;
-    private ConstraintLayout layout;
+    private RelativeLayout layout;
 
 
 
-    public Ennemi(Context context, float xPos, float yPos, ConstraintLayout layout) {
+    public Ennemi(Context context, float xPos, float yPos, RelativeLayout layout) {
         this.context = context;
         Log.println(Log.INFO, "debug", "context défini");
         this.layout = layout;
@@ -35,7 +36,9 @@ public class Ennemi {
         this.image = new ImageView(this.context);
         Log.println(Log.INFO, "debug", "image défini");
         image.setBackgroundResource(R.drawable.othershipx3);
+        Log.println(Log.INFO, "debug", "ajout background image");
         image.setLayoutParams(new ViewGroup.LayoutParams(128, 128));
+        Log.println(Log.INFO, "debug", "ajout taille image");
         this.layout.addView(image);
         Log.println(Log.INFO, "debug", "ajout layout défini");
         image.setX(xPos);
