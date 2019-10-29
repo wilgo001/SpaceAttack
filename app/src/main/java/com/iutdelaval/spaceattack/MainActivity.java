@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout relativeLayout;
     public float maxWidth;
     public float maxHeight;
+    public List<Ennemi> ennemis = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,32 @@ public class MainActivity extends AppCompatActivity {
         maxHeight = metrics.heightPixels;
         Log.println(Log.INFO, "debug", maxHeight+"/"+maxWidth);
         spaceship = new Spaceship(this, maxHeight, maxWidth, fenetre, relativeLayout);
+
+        //createEnnemis();
+
+    }
+
+    private void createEnnemis() {
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                Log.println(Log.INFO, "debug", "nouvelle vague d'ennemi");
+                float xPos = 0;
+                float yPos = 50;
+                for (int i = 0; i < 5; i++) {
+                    Log.println(Log.INFO, "debug", "nouvel ennemi");
+                    createEnnemi(xPos, yPos);
+                    Log.println(Log.INFO, "debug", "nouvel ennemi crée");
+                    xPos += maxWidth/5;
+                }
+            }
+        };
+        timer.schedule(task, 0, 2000);
+    }
+    public void createEnnemi(float xPos, float yPos) {
+
     }
 
     protected void onStop() {

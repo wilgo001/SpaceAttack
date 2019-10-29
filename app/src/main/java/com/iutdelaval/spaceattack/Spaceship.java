@@ -59,7 +59,15 @@ public class Spaceship implements SensorEventListener {
         accelerometre = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometre, SensorManager.SENSOR_DELAY_FASTEST);
 
-        createEnnemis();
+        float xPos = 0;
+        float yPos = -50;
+        for (int i = 0; i < 5; i++) {
+            Log.println(Log.INFO, "debug", "nouvel ennemi");
+            ennemis.add(new Ennemi(context, xPos, yPos, relativeLayout));
+            Log.println(Log.INFO, "debug", "nouvel ennemi crée");
+            xPos += maxWidth/5;
+        }
+
     }
     /*
      *changePosition : changer les coordonnees X et Y du vaisseau
@@ -86,7 +94,24 @@ public class Spaceship implements SensorEventListener {
             xPos -= sensorEvent.values[0];
             yPos += sensorEvent.values[1];
             changePosition();
+            if(contact()) {
+                accelerometre = null;
+            }
         }
+    }
+
+    private boolean contact() {
+        for(Ennemi ennemi : ennemis) {
+            boolean meeting = ((ennemi.getxPos()+ ennemi.getImage().getWidth())== xPos-image.getWidth());
+            meeting = meeting || (ennemi.getxPos() == xPos);
+            meeting = meeting || (ennemi.getyPos() == yPos);
+            meeting = meeting || (ennemi.getyPos()+ennemi.getImage().getHeight() == yPos-image.getHeight());
+            if(meeting) {
+                image = null;
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -97,26 +122,5 @@ public class Spaceship implements SensorEventListener {
     public void destroy() {
 
         image = null;
-    }
-
-
-    private void createEnnemis() {
-
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                Log.println(Log.INFO, "debug", "nouvelle vague d'ennemi");
-                float xPos = 0;
-                float yPos = -50;
-                for (int i = 0; i < 5; i++) {
-                    Log.println(Log.INFO, "debug", "nouvel ennemi");
-                    ennemis.add(new Ennemi(context, xPos, yPos, relativeLayout));
-                    Log.println(Log.INFO, "debug", "nouvel ennemi crée");
-                    xPos += maxWidth/5;
-                }
-            }
-        };
-        timer.schedule(task, 2000);
     }
 }

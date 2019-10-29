@@ -45,18 +45,36 @@ public class Ennemi {
         Log.println(Log.INFO, "debug", "coX défini");
         image.setY(yPos);
         Log.println(Log.INFO, "debug", "coY crée");
-        move();
-    }
 
-    private void move() {
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                image.setY(yPos+1);
-                yPos = image.getY();
+                move();
             }
         };
-        timer.schedule(task, 10);
+        timer.schedule(task, 1, 10);
+    }
+
+    private void move() {
+        yPos++;
+        image.setY(yPos);
+
+    }
+
+    public float getxPos() {
+        return xPos;
+    }
+
+    public float getyPos() {
+        return yPos;
+    }
+
+    public void setyPos(float yPos) {
+        this.yPos = yPos;
+    }
+
+    public ImageView getImage() {
+        return image;
     }
 }
