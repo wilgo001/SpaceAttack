@@ -46,31 +46,50 @@ public class MainActivity extends AppCompatActivity {
         Log.println(Log.INFO, "debug", maxHeight+"/"+maxWidth);
         spaceship = new Spaceship(this, maxHeight, maxWidth, fenetre, relativeLayout);
 
-        //createEnnemis();
+        createEnnemis();
 
     }
 
     private void createEnnemis() {
 
-        Timer timer = new Timer();
+        Timer timerCreate = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 Log.println(Log.INFO, "debug", "nouvelle vague d'ennemi");
                 float xPos = 0;
-                float yPos = 50;
+                float yPos = -50;
                 for (int i = 0; i < 5; i++) {
-                    Log.println(Log.INFO, "debug", "nouvel ennemi");
                     createEnnemi(xPos, yPos);
                     Log.println(Log.INFO, "debug", "nouvel ennemi crée");
                     xPos += maxWidth/5;
                 }
             }
         };
-        timer.schedule(task, 0, 2000);
+        Timer timerMove = new Timer();
+        TimerTask taskMove = new TimerTask() {
+            @Override
+            public void run() {
+                int i = 0;
+                for(Ennemi ennemi : ennemis) {
+                    ennemi.move();
+                    i++;
+                }
+            }
+        };
+        timerCreate.schedule(task, 0, 2000);
+        timerMove.schedule(taskMove, 1, 10);
     }
     public void createEnnemi(float xPos, float yPos) {
-
+        Ennemi ennemi = new Ennemi(this, xPos, yPos, relativeLayout);
+        Log.println(Log.INFO, "debug", "création de l'ennemi");
+        ennemi.getImage().setLayoutParams(new ViewGroup.LayoutParams(128, 128));
+        Log.println(Log.INFO, "debug", "ajout taille image");
+        relativeLayout.addView(ennemi.getImage());
+        Log.println(Log.INFO, "debug", "ajout au layout");
+        ennemis.add(ennemi);
+        Log.println(Log.INFO, "debug", "ajout à la liste ennemis");
+        ennemi.startTravel();
     }
 
     protected void onStop() {

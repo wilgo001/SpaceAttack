@@ -59,15 +59,6 @@ public class Spaceship implements SensorEventListener {
         accelerometre = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometre, SensorManager.SENSOR_DELAY_FASTEST);
 
-        float xPos = 0;
-        float yPos = -50;
-        for (int i = 0; i < 5; i++) {
-            Log.println(Log.INFO, "debug", "nouvel ennemi");
-            ennemis.add(new Ennemi(context, xPos, yPos, relativeLayout));
-            Log.println(Log.INFO, "debug", "nouvel ennemi crée");
-            xPos += maxWidth/5;
-        }
-
     }
     /*
      *changePosition : changer les coordonnees X et Y du vaisseau
@@ -95,7 +86,7 @@ public class Spaceship implements SensorEventListener {
             yPos += sensorEvent.values[1];
             changePosition();
             if(contact()) {
-                accelerometre = null;
+                //accelerometre = null;
             }
         }
     }

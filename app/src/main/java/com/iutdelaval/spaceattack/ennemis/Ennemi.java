@@ -26,40 +26,32 @@ public class Ennemi {
 
     public Ennemi(Context context, float xPos, float yPos, RelativeLayout layout) {
         this.context = context;
-        Log.println(Log.INFO, "debug", "context défini");
+        //Log.println(Log.INFO, "debug", "context défini");
         this.layout = layout;
-        Log.println(Log.INFO, "debug", "layout défini");
+        //Log.println(Log.INFO, "debug", "layout défini");
         this.xPos = xPos;
-        Log.println(Log.INFO, "debug", "x défini");
+        //Log.println(Log.INFO, "debug", "x défini");
         this.yPos = yPos;
-        Log.println(Log.INFO, "debug", "y défini");
+        //Log.println(Log.INFO, "debug", "y défini");
         this.image = new ImageView(this.context);
-        Log.println(Log.INFO, "debug", "image défini");
+        //Log.println(Log.INFO, "debug", "image défini");
         image.setBackgroundResource(R.drawable.othershipx3);
-        Log.println(Log.INFO, "debug", "ajout background image");
+        //Log.println(Log.INFO, "debug", "ajout background image");
         image.setLayoutParams(new ViewGroup.LayoutParams(128, 128));
-        Log.println(Log.INFO, "debug", "ajout taille image");
-        this.layout.addView(image);
-        Log.println(Log.INFO, "debug", "ajout layout défini");
-        image.setX(xPos);
-        Log.println(Log.INFO, "debug", "coX défini");
-        image.setY(yPos);
-        Log.println(Log.INFO, "debug", "coY crée");
-
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                move();
-            }
-        };
-        timer.schedule(task, 1, 10);
+        //Log.println(Log.INFO, "debug", "ajout taille image");
     }
 
-    private void move() {
+    public void move() {
         yPos++;
         image.setY(yPos);
 
+    }
+
+    public void startTravel() {
+        image.setX(xPos);
+        //Log.println(Log.INFO, "debug", "coX défini");
+        image.setY(yPos);
+        //Log.println(Log.INFO, "debug", "coY crée");
     }
 
     public float getxPos() {
