@@ -1,6 +1,5 @@
 package com.iutdelaval.spaceattack;
 
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -8,12 +7,10 @@ import android.hardware.SensorManager;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.iutdelaval.spaceattack.ennemis.Ennemi;
+import com.iutdelaval.spaceattack.fire.Fire;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,28 +19,26 @@ import java.util.TimerTask;
 
 public class Spaceship implements SensorEventListener {
 
-    private ImageView image;
-    private Context context;
+    private ImageButton image;
+    private MainActivity context;
     private float xPos;
     private float yPos;
     private Sensor accelerometre;
-    private ConstraintLayout layout;
-    private RelativeLayout relativeLayout;
+    private RelativeLayout layout;
     private float maxHeight;
     private float maxWidth;
-    public List<Ennemi> ennemis = new ArrayList<>();
+    public List<Fire> fires = new ArrayList<>();
 
-    public Spaceship(Context context, float maxHeight, float maxWidth, ConstraintLayout fenetre, RelativeLayout relativeLayout) {
-        this.relativeLayout = relativeLayout;
-        this.layout = fenetre;
+    public Spaceship(MainActivity context) {
+        this.layout = context.relativeLayout;
         this.context = context;
-        this.maxWidth = maxWidth;
-        this.maxHeight = maxHeight;
+        this.maxWidth = context.maxWidth;
+        this.maxHeight = context.maxHeight;
 
         // création de l'imageView du spaceship
-        this.image = new ImageView(context);
+        this.image = new ImageButton(context);
         this.image.setBackgroundResource(R.drawable.spaceship);
-        this.image.setLayoutParams(new ViewGroup.LayoutParams(((int)this.maxWidth/8),((int) this.maxWidth/8)));
+        this.image.setLayoutParams(new ViewGroup.LayoutParams(((int)this.maxWidth/6),((int) this.maxWidth/6)));
 
         xPos = maxWidth/2;
         yPos = maxHeight/2;
@@ -54,11 +49,52 @@ public class Spaceship implements SensorEventListener {
         this.image.setX(xPos);
         this.image.setY(yPos);
         Log.d("debug", this.image.getX()+"/"+this.image.getY());
+        fire();
+    }
 
+    private void fire() {
+        Timer timerFire = new Timer();
+        TimerTask timerTaskFire = new TimerTask() {
+            @Override
+            public void run() {
+                context.runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        fires.add(new Fire(context, image.getX(), image.getY()));
+
+                    }
+                });
+            }
+        };
+        Timer timerMove = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(Fire fire : fires) {
+                            if (fire.getImage().getY() - 1 <= 0-fire.getImage().getWidth())
+                            fire.getImage().setY(fire.getImage().getY() - 1);
+                        }
+                    }
+                });
+            }
+        };
+    }
+
+    public void setAccelerometre() {
         SensorManager sensorManager = (SensorManager) this.context.getSystemService(this.context.SENSOR_SERVICE);
+        Log.println(Log.INFO, "debug", "sensorManager créer");
         accelerometre = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Log.println(Log.INFO,"debug", "accelerometre créer");
         sensorManager.registerListener(this, accelerometre, SensorManager.SENSOR_DELAY_FASTEST);
+        Log.println(Log.INFO,"debug", "sensor Accelerometre register");
+    }
 
+    public ImageButton getImage() {
+        return this.image;
     }
     /*
      *changePosition : changer les coordonnees X et Y du vaisseau
@@ -85,24 +121,7 @@ public class Spaceship implements SensorEventListener {
             xPos -= sensorEvent.values[0];
             yPos += sensorEvent.values[1];
             changePosition();
-            if(contact()) {
-                //accelerometre = null;
-            }
         }
-    }
-
-    private boolean contact() {
-        for(Ennemi ennemi : ennemis) {
-            boolean meeting = ((ennemi.getxPos()+ ennemi.getImage().getWidth())== xPos-image.getWidth());
-            meeting = meeting || (ennemi.getxPos() == xPos);
-            meeting = meeting || (ennemi.getyPos() == yPos);
-            meeting = meeting || (ennemi.getyPos()+ennemi.getImage().getHeight() == yPos-image.getHeight());
-            if(meeting) {
-                image = null;
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
@@ -113,5 +132,19 @@ public class Spaceship implements SensorEventListener {
     public void destroy() {
 
         image = null;
+    }
+
+    private boolean contact() {
+        for(Fire ennemi : fires) {
+          /*  boolean meeting = ((ennemi.getxPos()+ ennemi.getImage().getWidth())== xPos-image.getWidth());
+            meeting = meeting || (ennemi.getxPos() == xPos);
+            meeting = meeting || (ennemi.getyPos() == yPos);
+            meeting = meeting || (ennemi.getyPos()+ennemi.getImage().getHeight() == yPos-image.getHeight());
+            if(meeting) {
+                image = null;
+                return true;
+            }*/
+        }
+        return true;
     }
 }

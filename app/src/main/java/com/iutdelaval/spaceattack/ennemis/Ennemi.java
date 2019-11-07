@@ -1,48 +1,42 @@
 package com.iutdelaval.spaceattack.ennemis;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
+import com.iutdelaval.spaceattack.MainActivity;
 import com.iutdelaval.spaceattack.R;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Ennemi {
 
 
     private ImageView image;
-    private Context context;
+    private MainActivity context;
     private final float xPos;
     private float yPos;
     private RelativeLayout layout;
 
 
 
-    public Ennemi(Context context, float xPos, float yPos, RelativeLayout layout) {
+    public Ennemi(MainActivity context, float xPos, float yPos) {
         this.context = context;
         //Log.println(Log.INFO, "debug", "context défini");
         this.layout = layout;
-        //Log.println(Log.INFO, "debug", "layout défini");
         this.xPos = xPos;
-        //Log.println(Log.INFO, "debug", "x défini");
         this.yPos = yPos;
-        //Log.println(Log.INFO, "debug", "y défini");
         this.image = new ImageView(this.context);
-        //Log.println(Log.INFO, "debug", "image défini");
-        image.setBackgroundResource(R.drawable.othershipx3);
-        //Log.println(Log.INFO, "debug", "ajout background image");
+        image.setBackgroundResource(R.drawable.spaceship);
         image.setLayoutParams(new ViewGroup.LayoutParams(128, 128));
-        //Log.println(Log.INFO, "debug", "ajout taille image");
+        image.setX(xPos);
+        image.setY(yPos);
+        context.relativeLayout.addView(image);
     }
 
     public void move() {
         yPos++;
+        if(yPos>context.maxWidth)
+            context.deleteEnnemi(this);
         image.setY(yPos);
 
     }
