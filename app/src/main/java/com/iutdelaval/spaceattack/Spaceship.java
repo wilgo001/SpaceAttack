@@ -43,7 +43,7 @@ public class Spaceship implements SensorEventListener {
         // création de l'imageView du spaceship
         this.image = new ImageView(context);
         this.image.setBackgroundResource(R.drawable.spaceship);
-        this.image.setLayoutParams(new ViewGroup.LayoutParams(128, 128));
+        this.image.setLayoutParams(new ViewGroup.LayoutParams(((int)this.maxWidth/8),((int) this.maxWidth/8)));
 
         xPos = maxWidth/2;
         yPos = maxHeight/2;
