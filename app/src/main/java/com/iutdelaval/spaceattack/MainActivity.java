@@ -1,15 +1,10 @@
 package com.iutdelaval.spaceattack;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.Constraints;
 
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageButton;
+import android.os.Handler;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -22,108 +17,86 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Spaceship spaceship;
-    private ConstraintLayout fenetre;
-    public RelativeLayout relativeLayout;
-    public float maxWidth;
-    public float maxHeight;
-    public List<Ennemi> ennemis = new ArrayList<>();
+    public Spaceship spaceship;
+    public RelativeLayout fenetre;
+    boolean spaceshipCreated = true;
+    public List<Ennemi> ennemiList = new ArrayList<>();
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fenetre =(ConstraintLayout) findViewById(R.id.fenetre);
-        relativeLayout = (RelativeLayout) findViewById(R.id.layout);
+        fenetre = (RelativeLayout) findViewById(R.id.fenetre);
+        spaceship = new Spaceship(this);
 
 
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Log.println(Log.INFO, "debug", "on start lancé");
-        DisplayMetrics metrics = this.getResources().getDisplayMetrics();
-        maxWidth = metrics.widthPixels;
-        maxHeight = metrics.heightPixels;
-        Log.println(Log.INFO, "debug", maxHeight+"/"+maxWidth);
-        spaceship = new Spaceship(this);
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        //createStars();
+        if(spaceshipCreated) {
+            spaceship.start();
+            spaceshipCreated = false;
+            Timer ennemiCount = new Timer();
+            TimerTask ennemiTask = new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            createSpaceship();
 
-        spaceship.getImage().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                spaceship.setAccelerometre();
-                createEnnemis();
-
-            }
-        });
-
+                        }
+                    });
+                }
+            };
+            ennemiCount.schedule(ennemiTask, 1000, 4000);
+            //createSpaceship();
+        }
     }
 
-    private void createEnnemis() {
-
-        Timer timerCreate = new Timer();
-        TimerTask task = new TimerTask() {
-
+    private void createStars() {
+        handler = new Handler();
+        Runnable run = new Runnable() {
             @Override
             public void run() {
-                runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-
-                        Log.println(Log.INFO, "debug", "nouvelle vague d'ennemi");
-                        float xPos = 0;
-                        float yPos = -50;
-                        for (int i = 0; i < 5; i++) {
-                            createEnnemi(xPos, yPos);
-                            Log.println(Log.INFO, "debug", "nouvel ennemi crée");
-                            xPos += maxWidth/5;
-                        }
-
-                    }
-                });
-
+                createStar();
+                handler.postDelayed(this, 500);
             }
         };
-        Timer timerMove = new Timer();
-        TimerTask taskMove = new TimerTask() {
+        handler.postDelayed(run, 0);
+        Timer starCount = new Timer();
+        TimerTask starTask = new TimerTask() {
             @Override
             public void run() {
                 runOnUiThread(new Runnable() {
-
                     @Override
                     public void run() {
-                        for(Ennemi ennemi : ennemis) {
-                            ennemi.move();
-                        }
+                        createStar();
+
                     }
                 });
             }
         };
-        timerCreate.schedule(task, 1000, 2000);
-        timerMove.schedule(taskMove, 1, 10);
-    }
-    public void createEnnemi(float xPos, float yPos) {
-        Ennemi ennemi = new Ennemi(this, xPos, yPos);
-        Log.println(Log.INFO, "debug", "création de l'ennemi");
-
-
-
-        Log.println(Log.INFO, "debug", "ajout au layout");
-        ennemis.add(ennemi);
-        Log.println(Log.INFO, "debug", "ajout à la liste ennemis");
-        ennemi.startTravel();
+        //starCount.schedule(starTask, 0, 500);
     }
 
-    protected void onStop() {
-        super.onStop();
-        spaceship.destroy();
+    private void createStar() {
+            Stars star = new Stars(MainActivity.this, (float) (fenetre.getWidth()*Math.random()), -200f);
     }
 
-    public void deleteEnnemi(Ennemi ennemi) {
-        ennemis.remove(ennemi);
+    private void createSpaceship() {
+        for (Ennemi ennemi : ennemiList) {
+            if (ennemi.getLife() <= 0)
+                fenetre.removeView(ennemi.getImage());
+                ennemiList.remove(ennemi);
+        }
+        for (int i=0; i < 5; i++) {
+            Ennemi ennemi = new Ennemi(MainActivity.this, fenetre.getWidth()*i/6 + fenetre.getWidth()*i/24, -200f);
+            ennemiList.add(ennemi);
+        }
     }
-
-
 }
