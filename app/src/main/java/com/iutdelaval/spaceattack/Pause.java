@@ -14,6 +14,7 @@ public class Pause {
 
     public static final String PAUSE = "PAUSE";
     public static final String PERDU = "PERDU";
+    public static final String GAGNE = "GAGNE !";
     private MainActivity context;
     private ImageView background;
     private TextView titre;
@@ -21,7 +22,7 @@ public class Pause {
     private ImageButton replay;
     private ImageButton resume;
 
-    public Pause(final MainActivity context, String titre) {
+    public Pause(final MainActivity context, final String titre) {
         this.context = context;
         this.titre = new TextView(this.context);
         this.titre.setText(titre);
@@ -59,27 +60,7 @@ public class Pause {
             }
         });
 
-        x += size*4;
-
-        if (titre.equals(this.PAUSE)) {
-            this.resume = new ImageButton(this.context);
-            this.resume.setBackgroundResource(R.drawable.play_button);
-            this.resume.setLayoutParams(params);
-            this.resume.setX(x);
-            this.resume.setY(y);
-            context.fenetre.addView(this.resume);
-            this.resume.bringToFront();
-
-            this.resume.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    setAlpha(0.0f);
-                    context.resume();
-                }
-            });
-        }
-
-        x += size*4;
+        x += size*8;
 
         this.replay = new ImageButton(this.context);
         this.replay.setBackgroundResource(R.drawable.return_button);
@@ -95,6 +76,30 @@ public class Pause {
                 context.recreate();
             }
         });
+
+        if (!titre.equals(this.PERDU)) {
+            x -= size*4;
+
+            this.resume = new ImageButton(this.context);
+            this.resume.setBackgroundResource(R.drawable.play_button);
+            this.resume.setLayoutParams(params);
+            this.resume.setX(x);
+            this.resume.setY(y);
+            context.fenetre.addView(this.resume);
+            this.resume.bringToFront();
+
+            this.resume.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setAlpha(0.0f);
+                    if (titre.equals(Pause.PAUSE))
+                        context.resume();
+                    if (titre.equals(Pause.GAGNE)) {
+                        context.goToNextLevel();
+                    }
+                }
+            });
+        }
 
     }
 

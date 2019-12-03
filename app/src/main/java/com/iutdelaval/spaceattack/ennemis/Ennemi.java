@@ -15,24 +15,24 @@ import android.os.Handler;
 
 public class Ennemi {
 
-    private MainActivity context;
-    private ImageView image;
+    protected MainActivity context;
+    protected ImageView image;
     private Handler handler;
-    private int life = 5;
+    int life;
 
-    public Ennemi(MainActivity context, float xPos, float yPos) {
+    public Ennemi(MainActivity context, float xPos, float yPos, int size, int life) {
+        this.life = life*3;
         this.context = context;
         this.image = new ImageView(context);
         this.handler = new Handler();
         this.image.setBackgroundResource(R.drawable.othershipx);
-        this.image.setLayoutParams(new RelativeLayout.LayoutParams(context.fenetre.getWidth()/6, context.fenetre.getWidth()/6));
+        this.image.setLayoutParams(new RelativeLayout.LayoutParams(size, size));
         this.image.setX(xPos);
         this.image.setY(yPos);
         this.context.fenetre.addView(this.image);
-        move();
     }
 
-    private void move() {
+    public void move() {
         Runnable run = new Runnable() {
             @Override
             public void run() {
@@ -48,8 +48,12 @@ public class Ennemi {
         handler.postDelayed(run, 0);
     }
 
-    private void moveEnnemi() {
+    void moveEnnemi() {
         this.image.setY(this.image.getY()+5);
+        ImageView spaceship = context.spaceship.getImage();
+        if (spaceship.getX() + spaceship.getWidth() >= this.image.getX() || spaceship.getX() <= this.image.getX() + this.image.getWidth()) {
+            context.setLose();
+        }
         boolean destructionY;
         boolean destructionX;
         destructionX = (this.image.getX() >= context.spaceship.getImage().getX());

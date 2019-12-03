@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.iutdelaval.spaceattack.ennemis.Boss;
 import com.iutdelaval.spaceattack.ennemis.Ennemi;
 import com.iutdelaval.spaceattack.fire.Fire;
 
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         spaceship = new Spaceship(this);
         Intent intent = this.getIntent();
         level = intent.getIntExtra(ListActivity.SPACEATTACK_LEVEL, 0);
-        nbVague = level * 20;
+        nbVague = level * 5;
         nbLife = level * 2;
         imageButton = (ImageButton) findViewById(R.id.imageButton);
         introMusic = MediaPlayer.create(this.getApplicationContext(), R.raw.music);
@@ -64,10 +65,14 @@ public class MainActivity extends AppCompatActivity {
     private void createSpaceship() {
         for (int n = 1; n <= nbVague; n++) {
             for (int i=0; i < 5; i++) {
-                Ennemi ennemi = new Ennemi(MainActivity.this, fenetre.getWidth()*i/6 + fenetre.getWidth()*i/24, -(fenetre.getHeight()/5)*n);
+                Ennemi ennemi = new Ennemi(MainActivity.this, fenetre.getWidth()*i/6 + fenetre.getWidth()*i/24, -(fenetre.getHeight()/3)*n,fenetre.getWidth()/6, level);
+                ennemi.move();
                 ennemiList.add(ennemi);
             }
         }
+        Boss boss = new Boss(MainActivity.this, fenetre.getWidth()/12, -fenetre.getHeight()/3*nbVague-fenetre.getWidth() * 5 / 6, fenetre.getWidth() * 5 / 6, level);
+        boss.move();
+        ennemiList.add(boss);
         imageButton.bringToFront();
     }
 
@@ -75,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
     public void setLose() {
         setPause(Pause.PERDU);
     }
+
+    public void  setWin() {
+        setPause(Pause.GAGNE);
+    }
+
     public void setPause(final String text) {
         pause = true;
         for (Fire fire : spaceship.fireList) {
@@ -104,4 +114,9 @@ public class MainActivity extends AppCompatActivity {
         introMusic.start();
     }
 
+    public void goToNextLevel() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(ListActivity.SPACEATTACK_LEVEL, level++);
+        startActivity(intent);
+    }
 }
