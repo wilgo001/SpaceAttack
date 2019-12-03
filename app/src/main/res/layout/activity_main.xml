@@ -12,5 +12,12 @@
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:srcCompat="@android:color/black" />
+        app:srcCompat="@color/space" />
+
+    <ImageButton
+        android:id="@+id/imageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="buttonPause"
+        app:srcCompat="@android:drawable/ic_media_pause" />
 </RelativeLayout>

@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -27,9 +28,11 @@ public class Spaceship implements SensorEventListener {
     private float xPos;
     private float yPos;
     private Sensor accelerometre;
-    private  TimerTask firetask;
-    private Timer firecount = new Timer();
+    private  Runnable firetask;
+    private Handler firecount = new Handler();
     private Fire fire;
+    public List<Fire> fireList = new ArrayList<>();
+    public int fireFrequence = 3000;
 
     public Spaceship(MainActivity context) {
 
@@ -60,25 +63,18 @@ public class Spaceship implements SensorEventListener {
     }
 
     private void startFire() {
-        firetask = new TimerTask() {
+        firetask = new Runnable() {
             @Override
             public void run() {
-                createFire();
+                if (!context.pause) {
+                    fire = new Fire(context, image.getX() + image.getWidth() / 2, image.getY());
+                    fireList.add(fire);
+                }
+                firecount.postDelayed(this, fireFrequence);
             }
         };
-        firecount.schedule(firetask, 1, 1000);
+        firecount.postDelayed(firetask, 1);
 
-    }
-
-    private void createFire() {
-
-        context.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                fire = new Fire(context, image.getX(), image.getY());
-            }
-        });
     }
 
 
@@ -98,27 +94,27 @@ public class Spaceship implements SensorEventListener {
      *
      */
     private void changePosition() {
-        boolean inWindowX = (xPos <= context.fenetre.getWidth() -image.getWidth());
-        inWindowX = inWindowX && (xPos >= 0);
-        boolean inWindowY = (yPos <= context.fenetre.getHeight() -image.getHeight()-100);
-        inWindowY = inWindowY && (yPos >= 0);
-        if(inWindowX)
-            image.setX(xPos);
-        if(inWindowY)
-            image.setY(yPos);
-        xPos=image.getX();
-        yPos=image.getY();
-        boolean destructionY;
-        boolean destructionX;
-        for(Ennemi ennemi : context.ennemiList) {
-            destructionY = this.image.getY() >= ennemi.getyPos();
-            destructionY = destructionY && (this.image.getY() <= ennemi.getyPos() + ennemi.getSize());
-            destructionX = this.image.getX() >= ennemi.getyPos();
-            destructionX = destructionX && (this.image.getX() <= ennemi.getxPos() + ennemi.getSize());
-            if (destructionX && destructionY) {
-                context.fenetre.removeAllViews();
-                Intent intent = new Intent(context, MainActivity.class);
-                context.startActivity(intent);
+        if (!context.pause) {
+            boolean inWindowX = (xPos <= context.fenetre.getWidth() - image.getWidth());
+            inWindowX = inWindowX && (xPos >= 0);
+            boolean inWindowY = (yPos <= context.fenetre.getHeight() - image.getHeight() - 100);
+            inWindowY = inWindowY && (yPos >= 0);
+            if (inWindowX)
+                image.setX(xPos);
+            if (inWindowY)
+                image.setY(yPos);
+            xPos = image.getX();
+            yPos = image.getY();
+            boolean destructionY;
+            boolean destructionX;
+            for (Ennemi ennemi : context.ennemiList) {
+                destructionY = this.image.getY() >= ennemi.getyPos();
+                destructionY = destructionY && (this.image.getY() <= ennemi.getyPos() + ennemi.getSize());
+                destructionX = this.image.getX() >= ennemi.getyPos();
+                destructionX = destructionX && (this.image.getX() <= ennemi.getxPos() + ennemi.getSize());
+                if (destructionX && destructionY) {
+                    context.setLose();
+                }
             }
         }
     }

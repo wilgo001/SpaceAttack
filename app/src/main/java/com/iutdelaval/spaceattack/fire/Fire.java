@@ -1,5 +1,6 @@
 package com.iutdelaval.spaceattack.fire;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -8,17 +9,15 @@ import com.iutdelaval.spaceattack.MainActivity;
 import com.iutdelaval.spaceattack.R;
 import com.iutdelaval.spaceattack.ennemis.Ennemi;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class Fire {
 
     private ImageView image;
     private MainActivity context;
     private float xPos;
     private float yPos;
-    private TimerTask movetask;
-    private Timer movecount = new Timer();
+    private boolean stop = false;
+    private Runnable movetask;
+    private Handler movecount = new Handler();
 
     public Fire(final MainActivity context, final float xPos, float yPos) {
         this.context = context;
@@ -27,26 +26,25 @@ public class Fire {
         this.image = new ImageView(context);
         this.image.setBackgroundResource(R.drawable.firebase);
         this.image.setLayoutParams(new ViewGroup.LayoutParams(context.fenetre.getWidth()/15, context.fenetre.getHeight()/15));
-        this.image.setX(xPos);
+        this.image.setX(xPos-context.fenetre.getWidth()/30);
         this.image.setY(yPos);
         this.context.fenetre.addView(image);
         move();
     }
 
     private void move() {
-        movetask = new TimerTask() {
+        movetask = new Runnable() {
             @Override
             public void run() {
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        moveFire();
-                    }
-                });
+                if (!context.pause)
+                    moveFire();
+                if (!stop && !context.pause) {
+                    movecount.postDelayed(this, 10);
+                }
             }
         };
 
-        movecount.schedule(movetask, 1, 10);
+        movecount.postDelayed(movetask, 1);
     }
 
     private void moveFire() {
@@ -56,13 +54,11 @@ public class Fire {
         for(Ennemi ennemi : context.ennemiList) {
             destructionY = this.image.getY() >= ennemi.getyPos();
             destructionY = destructionY && (this.image.getY() <= ennemi.getyPos()+ ennemi.getSize());
-            destructionX = this.image.getX() >= ennemi.getyPos();
+            destructionX = this.image.getX() >= ennemi.getxPos();
             destructionX = destructionX && (this.image.getX() <= ennemi.getxPos()+ennemi.getSize());
-            if (destructionX && destructionY) {
+            if (destructionX && destructionY && (ennemi.getyPos()+ennemi.getSize())>=0) {
                 this.remove();
-                movecount.cancel();
                 ennemi.loseLife();
-                Log.v("debug", "ennemi : " + context.ennemiList.indexOf(ennemi) + "touché");
             }
         }
 
@@ -73,8 +69,23 @@ public class Fire {
     }
 
     public void remove() {
-        this.image.setY(0);
-        this.image.setX(0);
+        stop = true;
         context.fenetre.removeView(image);
+    }
+
+    public float getyPos() {
+        return image.getY();
+    }
+
+    public float getWidth() {
+        return image.getWidth();
+    }
+
+    public float getHeight() {
+        return image.getHeight();
+    }
+
+    public float getxPos() {
+        return image.getX();
     }
 }

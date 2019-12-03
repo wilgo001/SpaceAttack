@@ -1,5 +1,6 @@
 package com.iutdelaval.spaceattack.ennemis;
 
+import android.graphics.Color;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
@@ -8,20 +9,16 @@ import android.widget.RelativeLayout;
 
 import com.iutdelaval.spaceattack.MainActivity;
 import com.iutdelaval.spaceattack.R;
-import android.os.Handler;
+import com.iutdelaval.spaceattack.fire.Fire;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.logging.LogRecord;
+import android.os.Handler;
 
 public class Ennemi {
 
     private MainActivity context;
     private ImageView image;
-    private TimerTask movetask;
-    private Timer movecount;
     private Handler handler;
-    private int life = 1000;
+    private int life = 5;
 
     public Ennemi(MainActivity context, float xPos, float yPos) {
         this.context = context;
@@ -39,13 +36,13 @@ public class Ennemi {
         Runnable run = new Runnable() {
             @Override
             public void run() {
-                moveEnnemi();
+                if (!context.pause)
+                    moveEnnemi();
                 if (image.getY()>=context.fenetre.getHeight()) {
                     remove();
                     life = 0;
-                }else {
-                    handler.postDelayed(this, 50);
                 }
+                handler.postDelayed(this, 50);
             }
         };
         handler.postDelayed(run, 0);
@@ -53,12 +50,24 @@ public class Ennemi {
 
     private void moveEnnemi() {
         this.image.setY(this.image.getY()+5);
+        boolean destructionY;
+        boolean destructionX;
+        destructionX = (this.image.getX() >= context.spaceship.getImage().getX());
+        destructionX = destructionX && (this.image.getX() + this.image.getWidth() <= context.spaceship.getImage().getX());
+        destructionY = (this.image.getY() >= context.spaceship.getImage().getY());
+        destructionY = destructionY && (this.image.getY() + this.image.getHeight() <= context.spaceship.getImage().getY());
+        if (destructionX && destructionY) {
+            context.setLose();
+        }
+
     }
 
 
     public void remove() {
+        this.image.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
+        this.image.setX(0f);
+        this.image.setY(0f);
         context.fenetre.removeView(image);
-        movecount.cancel();
     }
 
     public float getxPos() {
@@ -74,11 +83,18 @@ public class Ennemi {
     }
 
     public void loseLife() {
+        life--;
+        image.setBackgroundResource(R.drawable.ennemislane);
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                image.setBackgroundResource(R.drawable.othershipx);
+            }
+        };
+        Handler handler = new Handler();
+        handler.postDelayed(run, 500);
         if (life < 0) {
-            //remove();
-        }else {
-            life--;
-            //image.setBackgroundResource(R.color.white);
+            remove();
         }
 
     }
